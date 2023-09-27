@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: java-simple
+  name: java-simple
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-simple-deployment
+  labels:
+    app: java-simple
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-simple
+  template:
+    metadata:
+      labels:
+        app: java-simple
+    spec:
+      containers:
+      - name: java-simple
+        image: apmartins85/java-simple:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value:  http://opentelemetry-demo-otelcol.otel-collector:4317
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-simple-service
+spec:
+  selector:
+    app.kubernetes.io/name: java-simple
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
